@@ -18,6 +18,7 @@ spec:
         app: semaphore-web
         tier: frontend
     spec:
+      serviceAccountName: semaphore-service-account
       containers:
       - image: ansiblesemaphore/semaphore
         name: semaphore-web
