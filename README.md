@@ -1,0 +1,1 @@
+# mas-devops-ansible-semaphore
