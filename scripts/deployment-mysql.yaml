@@ -1,0 +1,53 @@
+apiVersion:  apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: semaphore-mysql
+  labels:
+    app: semaphore-web
+spec:
+  selector:
+    matchLabels:
+      app: semaphore-web
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: semaphore-web
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: semaphore
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: semaphore-secret
+              key: MYSQL_USER
+              optional: false
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: semaphore-secret
+              key: MYSQL_PASSWORD
+              optional: false
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: semaphore-secret
+              key: MYSQL_ROOT_PASSWORD
+              optional: false
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage  # which data will be stored
+          mountPath: "/var/lib/mysql"
+      volumes:
+      - name: mysql-persistent-storage    # PVC
+        persistentVolumeClaim:
+          claimName: mysql-persistent-storage
