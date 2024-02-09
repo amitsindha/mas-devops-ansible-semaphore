@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: mysql-persistent-storage
   labels:
-    app: wordpress
+    app: semaphore-web
   namespace: semaphore
 spec:
   accessModes:
