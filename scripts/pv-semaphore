@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: semaphore-persistent-storage
+  labels:
+    app: semaphore-web
+    tier: frontend
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.10.10.2
+    path: /shares/nfs-sc
