@@ -1,0 +1,94 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: semaphore-web
+  labels:
+    app: semaphore-web
+  namespace: semaphore
+spec:
+  selector:
+    matchLabels:
+      app: semaphore-web
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: semaphore-web
+        tier: frontend
+    spec:
+      containers:
+      - image: ansiblesemaphore/semaphore
+        name: semaphore-web
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass          # generated before in secret.yml
+              key: password
+
+          - name: SEMAPHORE_ADMIN
+            valueFrom:
+              secretKeyRef:
+                name: semaphore-secret
+                key: SEMAPHORE_ADMIN
+                optional: false
+          - name: SEMAPHORE_ADMIN_NAME
+            valueFrom:
+              secretKeyRef:
+                name: semaphore-secret
+                key: SEMAPHORE_ADMIN_NAME
+                optional: false
+          - name: SEMAPHORE_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: semaphore-secret
+                key: SEMAPHORE_ADMIN_PASSWORD
+                optional: false
+          - name: SEMAPHORE_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: semaphore-secret
+                key: SEMAPHORE_DB_PASS
+                optional: false
+          - name: SEMAPHORE_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: semaphore-secret
+                key: SEMAPHORE_DB_USER
+                optional: false
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: SEMAPHORE_DB
+            value: semaphore
+          - name: SEMAPHORE_DB_DIALECT
+            value: mysql
+          - name: SEMAPHORE_DB_HOST
+            value: semaphore-mysql
+          - name: SEMAPHORE_DB_PORT
+            value: "3306"
+          - name: SEMAPHORE_PLAYBOOK_PATH
+            value: /tmp/semaphore
+          #I am unable to make GUI work with this set, so commented this
+          #- name: SEMAPHORE_WEB_ROOT
+          #  value: http://127.0.0.1:3000
+
+          # use head -c32 /dev/urandom | base64 to generate the below value
+          - name: SEMAPHORE_ACCESS_KEY_ENCRYPTION
+            value: Q3wYAzx89dRTZWiS11INE63Yi3hv53rJsW6raMdRdLo=
+            
+        ports:
+        - containerPort: 3000
+          name: semaphore
+        volumeMounts:
+        - name: semaphore-persistent-storage
+          mountPath: "/var/www/html"          # which data will be stored
+      volumes:
+      - name: semaphore-persistent-storage
+        persistentVolumeClaim:
+          claimName: semaphore-persistent-storage
