@@ -4,6 +4,7 @@ metadata:
   name: semaphore-mysql
   labels:
     app: semaphore-web
+  namespace: semaphore
 spec:
   selector:
     matchLabels:
