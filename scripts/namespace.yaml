@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: mas-devops-ansible-semaphore
+  name: semaphore
   labels:
     security.openshift.io/scc.podSecurityLabelSync: 'false'
     openshift.io/run-level: '0'    
